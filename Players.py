@@ -28,7 +28,7 @@ class Player2(Snake):
             "up": pygame.K_w, 
             "down": pygame.K_s
             }
-        self.steering_mode="absolute"
+        self.steering_mode="relative"
 
     def __str__(self):
         return "Yellow Player"

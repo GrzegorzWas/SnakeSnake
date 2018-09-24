@@ -141,12 +141,12 @@ class GameManager:
         self.spawn_pickup()
 
     def spawn_pickup(self):
-        x = random.randrange(self.pickup_radius , self.display.width - self.pickup_radius)
-        y = random.randrange(self.pickup_radius, self.display.height - self.pickup_radius)
+        x = random.randrange(self.pickup_radius , self.display.play_area_width - self.pickup_radius)
+        y = random.randrange(self.pickup_radius, self.display.play_area_height - self.pickup_radius)
 
-        while self.display.detect_collision((x, y), self.pickup_radius*2, self.pickup_color)[0]:
-            x = random.randrange(self.pickup_radius , self.display.width - self.pickup_radius)
-            y = random.randrange(self.pickup_radius, self.display.height - self.pickup_radius)
+        while self.display.detect_collision((x, y), self.pickup_radius*5, self.pickup_color)[0]:
+            x = random.randrange(self.pickup_radius , self.display.play_area_width - self.pickup_radius)
+            y = random.randrange(self.pickup_radius, self.display.play_area_height - self.pickup_radius)
         
         self.pickups.append(Point(x, y))
         self.display.draw_point((x, y), self.pickup_color, self.pickup_radius)

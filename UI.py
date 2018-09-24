@@ -8,6 +8,7 @@ class UIState:
     Visible = 1
 
 class MenuOption:
+    """Base class for interactive menu options"""
     def __init__(self, text, position, redirect):
         self.text = text
         self.position = position
@@ -68,11 +69,19 @@ class SettingsOption(MenuOption):
     def __str__(self):
         return self.group + " " + self.text
 
-
-class MenuLabel:
-    def __init__(self, text, position, size=70, color=(255, 220, 77), border = (55, 111, 158), font="Bungee"):
-        self.text = text
+class MenuDecorator:
+    """Abstract base class for uninteractive menu items"""
+    def __init__(self, position):
         self.position = position
+        self.id = ""
+        
+    def draw(self, display):
+        pass
+
+class MenuLabel(MenuDecorator):
+    def __init__(self, text, position, size=70, color=(255, 220, 77), border = (55, 111, 158), font="Bungee"):
+        super().__init__(position)
+        self.text = text
 
         self.font = font
         self.font_size = size
@@ -83,9 +92,23 @@ class MenuLabel:
     def draw(self, display):
         display.draw_text(  self.text, self.font_size, self.color, position=self.position, font=self.font, bordered=True, border_color=self.border)
 
-
     def __str__(self):
         return self.text 
+
+class MenuSeparator(MenuDecorator):
+    def __init__(self, position, width, length, color=(100, 100, 100)):
+        super().__init__(position)
+        self.width = width
+        self.length = length
+        self.color = color
+        self.id = ""
+        
+    def draw(self, display):
+        display.draw_horizontal_line(self.position, self.width, self.length, self.color)
+
+
+    def __str__(self):
+        return "i dont know what you expect here"
 
 
 class UIPane:
@@ -99,10 +122,10 @@ class UIPane:
     SelectSpeedMenu = 7
     Pages = [None, None, None, None, None, None, None, None]
 
-    def __init__(self, buttons, labels):
+    def __init__(self, buttons, decorators):
         if buttons != None :
             self.buttons = buttons
-            self.labels = labels
+            self.decorators = decorators
             self.selected_index = 0
             if len(buttons) > 0:
                 self.selected_button = buttons[self.selected_index]
@@ -148,7 +171,7 @@ class UIPane:
     def draw(self, display):
         for b in self.buttons:
             b.draw(display)
-        for l in self.labels:
+        for l in self.decorators:
             l.draw(display)
 
 
@@ -177,8 +200,9 @@ class UI:
                 MenuOption("Settings",  (None, self.display.height/2), UIPane.SettingsMenu),
                 MenuOption("Quit",      (None, self.display.height/2 + 80), None),
             ],
-            labels = [
-                MenuLabel("3 wiedzmin 3 najlepszy", (None, self.display.height/2 - 250))
+            decorators = [
+                MenuLabel("Snake",      (self.display.width/2 - 250, self.display.height/2 - 250)),
+                MenuLabel("Snake",      (self.display.width/2 + 25, self.display.height/2 - 250), color=(55, 111, 158), border = (255, 220, 77))
             ]
         )  
         #play menu
@@ -189,7 +213,7 @@ class UI:
                 MenuOption("Starve",    (None, self.display.height/2 + 80), UIPane.IngameMenu),
                 MenuOption("Return to main menu", (None, self.display.height/2 + 160), UIPane.MainMenu)
             ],
-            labels = [
+            decorators = [
             ])       
         #settings menu 
         UIPane.Pages[UIPane.SettingsMenu]= UIPane(
@@ -203,10 +227,13 @@ class UI:
                 MenuOption("Set speed", (None, self.display.height/10 + 700), UIPane.SelectSpeedMenu),
                 MenuOption("Return to menu", (None, self.display.height*9/10), UIPane.MainMenu)
             ],
-            labels = [
-                MenuLabel("Controls",       (None, self.display.height/10), 50),
+            decorators = [
+                MenuLabel("Controls",       (None, self.display.height/15), 50),
+                #MenuSeparator(              (None, self.display.height/10 + 80), 2, 400),
                 MenuLabel("Blue player",    (None, self.display.height/10 + 100), 30, color=(55, 111, 158), border = (255, 220, 77)),
-                MenuLabel("Yellow player",  (None, self.display.height/10 + 400), 30)
+                MenuSeparator(              (None, self.display.height/10 + 370), 2, 600),
+                MenuLabel("Yellow player",  (None, self.display.height/10 + 400), 30),
+                MenuSeparator(              (None, self.display.height/10 + 670), 2, 550)
             ])
         #key bindings menu
         UIPane.Pages[UIPane.KeyBindingsMenu] = UIPane(
@@ -218,7 +245,7 @@ class UI:
                 MenuOption("Apply",     (None, self.display.height/5 + 500), UIPane.SettingsMenu),
                 MenuOption("Go Back",   (None, self.display.height/5 + 560), UIPane.SettingsMenu)
             ],
-            labels = [
+            decorators = [
                 MenuLabel("Up",     (self.display.width/2 - 170, self.display.height/5), 40),
                 MenuLabel("Down",   (self.display.width/2 - 170, self.display.height/5 + 100), 40),
                 MenuLabel("Left",   (self.display.width/2 - 170, self.display.height/5 + 200) , 40),
@@ -227,7 +254,7 @@ class UI:
         #press key prompt
         UIPane.Pages[UIPane.PressKeyPrompt] = UIPane(
             buttons = [],
-            labels = [
+            decorators = [
                 MenuLabel("Press a key", (None, None), 40, color=(255,255,255), border=(0,0,0) ,font="Pixel"),
             ])   
         #select speed menu
@@ -238,7 +265,7 @@ class UI:
                 SettingsOption("Fast", (None, self.display.height/10 + 280), None, "speed"),
                 MenuOption("Go Back", (None, self.display.height/10 + 380), UIPane.SettingsMenu)
             ],
-            labels = [
+            decorators = [
                 MenuLabel("Select speed", (None, self.display.height/10), 50),
             ])
         #ingame menu
@@ -249,7 +276,7 @@ class UI:
                 MenuOption("Play Again", (None, self.display.height /2 + 80), UIPane.IngameMenu),
                 MenuOption("Return to main menu", (None, self.display.height /2 + 160), UIPane.MainMenu)
             ],
-            labels = [      
+            decorators = [      
             ]
         )     
         self.current_page = UIPane.Pages[UIPane.MainMenu]

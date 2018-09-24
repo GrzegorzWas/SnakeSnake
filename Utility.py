@@ -82,13 +82,28 @@ class Display():
     """
     Wrapper class for pygame rendering and display handling
     """  
-    def __init__(self, size):
+    def __init__(self, size, play_area_size=(None, None)):
         self.width, self.height = size
         self.size = size
+        self.play_area_size = play_area_size
         self._display_surface = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self.erase_list = []
         self.bg_color = (0,0,0)
         self._display_surface.fill(self.bg_color)
+
+    @property
+    def play_area_width(self):
+        if self.play_area_size[0] != None:
+            return self.play_area_size[0]
+        else:
+            return self.width
+
+    @property
+    def play_area_height(self):
+        if self.play_area_size[1] != None:
+            return self.play_area_size[1]
+        else:
+            return self.height
 
     def erase_enqueue(self, point, radius):
         """
@@ -110,6 +125,31 @@ class Display():
             radius (int): radius of the drawn point. 5 is default 
         """
         pygame.draw.circle(self._display_surface, color, pos, radius)
+
+    def draw_horizontal_line(self, position, thickness, length, color):
+        """
+        Draw line on display surface
+        Args:
+            position ((int, int)): tuple of x and y line coords. center is default 
+            thickness (int): thickness in pixels
+            length (int): length in pixels
+            color ((int, int, int)): tuple of rgb color values
+        """
+        start_pos = None
+        end_pos = None
+        if position == None:
+            start_position = (self.width // 2 -  length/2), (self.height // 2)
+            end_position = (self.width // 2 +  length/2), (self.height // 2)
+        else:
+            x, y = position
+            if x == None:
+                x = (self.width // 2 -  length/2)
+            if y == None:
+                y = (self.height // 2)
+            start_pos = x, y
+            end_pos = x + length, y
+
+        pygame.draw.line(self._display_surface, color, start_pos, end_pos, thickness)
 
     def draw_rect(self, size, color, position=None):
         """

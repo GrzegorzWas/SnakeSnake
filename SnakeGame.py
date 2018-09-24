@@ -14,9 +14,9 @@ class SnakeGame:
     def __init__(self):       
         pygame.init()
         pygame.font.init()
-        self.display = Display((1000, 1000))
+        self.display = Display((1000, 1000), (None,900))
         self.clock = pygame.time.Clock()
-        self.FPS = 60
+        self.FPS = 200
         self.ui = UI(self. display)
         self.selected_speed = "speed Medium"
         self.game_manager = GameManager(self.display, self.ui, GameMode.EatToGrow, GameState.Menu)

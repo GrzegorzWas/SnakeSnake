@@ -90,13 +90,13 @@ class Snake():
         #make snake appear on the other side of
         # the screen when passing through walls 
         if self.head_pos.x <= 0:
-            self.head_pos.x = self.display.width
-        elif self.head_pos.x >= self.display.width:
+            self.head_pos.x = self.display.play_area_width
+        elif self.head_pos.x >= self.display.play_area_width:
             self.head_pos.x = 0
 
         if self.head_pos.y <= 0:
-            self.head_pos.y = self.display.height    
-        elif self.head_pos.y >= self.display.height:
+            self.head_pos.y = self.display.play_area_height    
+        elif self.head_pos.y >= self.display.play_area_height:
             self.head_pos.y = 0
 
         #check for collision
