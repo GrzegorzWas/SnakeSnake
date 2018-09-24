@@ -16,7 +16,7 @@ class SnakeGame:
         pygame.font.init()
         self.display = Display((1000, 1000), (None,900))
         self.clock = pygame.time.Clock()
-        self.FPS = 200
+        self.FPS = 60
         self.ui = UI(self. display)
         self.selected_speed = "speed Medium"
         self.game_manager = GameManager(self.display, self.ui, GameMode.EatToGrow, GameState.Menu)
@@ -26,7 +26,7 @@ class SnakeGame:
         Start a new game
         """ 
         self.display.clear()  
-        self.ui.hide()
+        #self.ui.hide()
         if self.selected_speed == "speed Slow":
             self.game_manager.set_players_speed(1.9)
         elif self.selected_speed == "speed Medium":

@@ -35,6 +35,8 @@ class GameManager:
             self.player2.steering_mode = p2.steering_mode 
             self.player2.speed = p2.speed
         self.ui = ui
+        self.ui.reset_p1_score()
+        self.ui.reset_p2_score()
         self.game_mode = game_mode
 
         self.pickup_color = (255, 255, 255)
@@ -90,9 +92,9 @@ class GameManager:
 
         if self.player1.collided and self.player2.collided:
             self.finish_game()
-        elif self.player1.collided:
+        elif self.player1.collided and self.player1.collided_color != (100,100,100):
             self.finish_game( winner=self.player2, loser=self.player1 )
-        elif self.player2.collided:
+        elif self.player2.collided and self.player2.collided_color != (100,100,100):
             self.finish_game( winner=self.player1, loser=self.player2 )
 
         if self.game_mode == GameMode.EatToSurvive:
@@ -137,7 +139,11 @@ class GameManager:
         elif self.game_mode == GameMode.EatToGrow:
             player._length += 25
             player.speed += 0.1
-        player.collided = False      
+        player.collided = False 
+        if isinstance(player, Player1):
+            self.ui.increment_p1_score()
+        elif isinstance(player, Player2):
+            self.ui.increment_p2_score()
         self.spawn_pickup()
 
     def spawn_pickup(self):

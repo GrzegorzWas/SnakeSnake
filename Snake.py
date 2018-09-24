@@ -30,7 +30,7 @@ class Snake():
         self.color = (255, 0, 0)
         self._length = 100.0
         self.speed = 5
-        self.rotation_factor =  self.speed**4.2 /100
+        self.rotation_factor =  self.speed**4.2 /120
         self.decay_speed = 4
         
         #the way you want the snake to be controlled

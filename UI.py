@@ -41,7 +41,6 @@ class MenuOption:
     def get_group(self):
         return "default"
 
-
 class SettingsOption(MenuOption):
     def __init__(self, text, position, redirect, group, selected=False):
         super().__init__(text, position, redirect)
@@ -96,15 +95,15 @@ class MenuLabel(MenuDecorator):
         return self.text 
 
 class MenuSeparator(MenuDecorator):
-    def __init__(self, position, width, length, color=(100, 100, 100)):
+    def __init__(self, position, thickness, length, color=(100, 100, 100)):
         super().__init__(position)
-        self.width = width
+        self.thickness = thickness
         self.length = length
         self.color = color
         self.id = ""
         
     def draw(self, display):
-        display.draw_horizontal_line(self.position, self.width, self.length, self.color)
+        display.draw_horizontal_line(self.position, self.thickness, self.length, self.color)
 
 
     def __str__(self):
@@ -192,6 +191,8 @@ class UI:
         self.currently_changed_control = ""
         self.currently_changed_player = ""
         self.selected_speed = ""
+        self.p1_score = 0
+        self.p2_score = 0
 
         #main menu
         UIPane.Pages[UIPane.MainMenu] = UIPane(
@@ -269,7 +270,16 @@ class UI:
                 MenuLabel("Select speed", (None, self.display.height/10), 50),
             ])
         #ingame menu
-        UIPane.Pages[UIPane.IngameMenu] = None
+        UIPane.Pages[UIPane.IngameMenu] = UIPane(
+            buttons = [
+            ],
+            decorators = [
+                MenuSeparator((None, self.display.height), (self.display.height - self.display.play_area_height)*2, self.display.width, color=(150,150,150)),
+                MenuSeparator((None, self.display.height*9/10 + 10), 20, self.display.width),
+                MenuLabel("Score",  (None, self.display.height*9/10 + 30), 30, font="Pixel", color=(255,255,255), border=(100,100,100)),
+                MenuLabel("0",      (self.display.width/10, self.display.height*9/10 + 30), 30, font="Pixel"),
+                MenuLabel("0",      (self.display.width*9/10, self.display.height*9/10 + 30), 30, font="Pixel", color=(55, 111, 158), border = (255, 220, 77))
+            ])
         #endgame menu
         UIPane.Pages[UIPane.EndgameMenu] = UIPane(
             buttons = [
@@ -363,5 +373,23 @@ class UI:
         UIPane.Pages[UIPane.KeyBindingsMenu].buttons[1].text = d
         UIPane.Pages[UIPane.KeyBindingsMenu].buttons[2].text = l
         UIPane.Pages[UIPane.KeyBindingsMenu].buttons[3].text = r
+
+    def increment_p1_score(self):
+        self.p1_score += 1
+        UIPane.Pages[UIPane.IngameMenu].decorators[4].text = str(self.p1_score)
+
+    def increment_p2_score(self):
+        self.p2_score += 1
+        UIPane.Pages[UIPane.IngameMenu].decorators[3].text = str(self.p2_score)
+
+    def reset_p1_score(self):
+        self.p1_score = 0
+        UIPane.Pages[UIPane.IngameMenu].decorators[4].text = str(self.p1_score)
+
+    def reset_p2_score(self):
+        self.p2_score = 0
+        UIPane.Pages[UIPane.IngameMenu].decorators[3].text = str(self.p1_score)
+
+    
 
 
