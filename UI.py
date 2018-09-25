@@ -390,6 +390,9 @@ class UI:
         self.p2_score = 0
         UIPane.Pages[UIPane.IngameMenu].decorators[3].text = str(self.p1_score)
 
+    def disable_quit_button(self):
+        del UIPane.Pages[UIPane.MainMenu].buttons[-1]
+
     
 
 

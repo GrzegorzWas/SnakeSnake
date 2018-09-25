@@ -82,11 +82,17 @@ class Display():
     """
     Wrapper class for pygame rendering and display handling
     """  
-    def __init__(self, size, play_area_size=(None, None)):
-        self.width, self.height = size
-        self.size = size
-        self.play_area_size = play_area_size
-        self._display_surface = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
+    def __init__(self, size, fullscreen):     
+        if fullscreen:
+            infoObject = pygame.display.Info()
+            self.size = infoObject.current_w, infoObject.current_h
+            self.width, self.height = self.size
+            self._display_surface = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        else:
+            self.width, self.height = size
+            self.size = size
+            self._display_surface = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
+        self.play_area_size = self.width, self.height*9//10
         self.erase_list = []
         self.bg_color = (0,0,0)
         self._display_surface.fill(self.bg_color)

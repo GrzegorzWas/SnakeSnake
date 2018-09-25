@@ -1,4 +1,5 @@
 import pygame
+import argparse
 import time
 from Players import Player1, Player2
 from UI import UI, UIPane
@@ -6,18 +7,34 @@ from GameManager import GameManager, GameState, GameMode
 from Utility import Display
 #from pygame.locals import *
 
+class Setup:
+    NoQuit = 0
+    Desktop = 1
+    Fullscreen = 3
+    Windowed = 4
 
 class SnakeGame:
     """
     Main game class
     """
-    def __init__(self):       
+    def __init__(self, s_width, s_height, setup):       
         pygame.init()
         pygame.font.init()
-        self.display = Display((1000, 1000), (None,900))
+
+        noquit = False
+        fullscreen = False
+        for opt in setup:
+            if opt == Setup.NoQuit:
+                noquit = True
+            elif opt == Setup.Fullscreen:
+                fullscreen = True
+            
+        self.display = Display((s_width, s_height), fullscreen)
         self.clock = pygame.time.Clock()
         self.FPS = 60
         self.ui = UI(self. display)
+        if noquit:
+            self.ui.disable_quit_button()
         self.selected_speed = "speed Medium"
         self.game_manager = GameManager(self.display, self.ui, GameMode.EatToGrow, GameState.Menu)
 
@@ -162,7 +179,24 @@ class SnakeGame:
 
 
 if __name__ == "__main__":
-    game = SnakeGame()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--size", default="1000x900")
+    parser.add_argument("-nq", "--noquit", action="store_true")
+    parser.add_argument("-f", "--fullscreen", action="store_true")
+    args = parser.parse_args()
+
+    setup = []
+
+    if args.noquit:
+        setup.append(Setup.NoQuit)
+    else:
+        setup.append(Setup.Desktop)
+
+    if args.fullscreen:
+        setup.append(Setup.Fullscreen)
+    
+    s_width, s_height = [int(x) for x in args.size.split("x")]
+
+    game = SnakeGame(s_width, s_height, setup)
     game.main_loop()
-        
         
