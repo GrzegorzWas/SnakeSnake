@@ -26,6 +26,7 @@ class GameManager:
         self.player1 = Player1(self.display)
         self.player2 = Player2(self.display)
         
+        #copy settings from players used in previous game
         if p1 != None:
             self.player1.steering_mode = p1.steering_mode     
             self.player1.controls = p1.controls
@@ -34,11 +35,14 @@ class GameManager:
             self. player2.controls = p2.controls
             self.player2.steering_mode = p2.steering_mode 
             self.player2.speed = p2.speed
+
+        #setup ui
         self.ui = ui
         self.ui.reset_p1_score()
         self.ui.reset_p2_score()
         self.game_mode = game_mode
 
+        #setup game management stuff
         self.pickup_color = (255, 255, 255)
         self.pickup_radius = 7
         self.pickups = []
@@ -46,6 +50,7 @@ class GameManager:
         self.loser = None
         self.game_state = game_state
 
+        #setup the game based on selected game mode
         if self.game_mode == GameMode.InfiniteSnake:
             self.player1._length = -1
             self.player2._length = -1
@@ -160,6 +165,10 @@ class GameManager:
     def control_players(self, pressed_keys):
         self.player1.steer(pressed_keys)
         self.player2.steer(pressed_keys)
+
+    def control_players_arcade(self, joysticks):
+        self.player2.joy_steer(joysticks[0].get_axis(0), joysticks[0].get_axis(1))
+        self.player1.joy_steer(joysticks[1].get_axis(0), joysticks[1].get_axis(1))
 
     def draw_players(self):
         self.player1.draw()

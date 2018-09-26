@@ -8,7 +8,7 @@ from Utility import Display
 #from pygame.locals import *
 
 class Setup:
-    NoQuit = 0
+    Arcade = 0
     Desktop = 1
     Fullscreen = 3
     Windowed = 4
@@ -21,20 +21,29 @@ class SnakeGame:
         pygame.init()
         pygame.font.init()
 
-        noquit = False
+        self.arcade = False
         fullscreen = False
         for opt in setup:
-            if opt == Setup.NoQuit:
-                noquit = True
+            if opt == Setup.Arcade:
+                self.arcade = True
             elif opt == Setup.Fullscreen:
                 fullscreen = True
             
+        self.joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+        for j in self.joysticks:
+            j.init()
+
         self.display = Display((s_width, s_height), fullscreen)
         self.clock = pygame.time.Clock()
         self.FPS = 60
+
         self.ui = UI(self. display)
-        if noquit:
-            self.ui.disable_quit_button()
+        if self.arcade:
+            if len(self.joysticks) == 0:  
+                print("=================== plug in the controller ===================")  
+                exit(1)
+            self.ui.enable_arcade_mode()
+        
         self.selected_speed = "speed Medium"
         self.game_manager = GameManager(self.display, self.ui, GameMode.EatToGrow, GameState.Menu)
 
@@ -58,7 +67,11 @@ class SnakeGame:
         """
         keys = pygame.key.get_pressed()
         if self.game_manager.game_state == GameState.Running:
-            self.game_manager.control_players(keys)
+            if self.arcade:
+                self.game_manager.control_players_arcade(self.joysticks)
+                self.ui.arcade_control(self.joysticks[1])
+            else:
+                self.game_manager.control_players(keys)
         # elif self.game_manager.game_state == GameState.Finished or \
         # self.game_manager.game_state == GameState.Menu:
         #     self.ui.control(keys)
@@ -181,14 +194,14 @@ class SnakeGame:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--size", default="1000x900")
-    parser.add_argument("-nq", "--noquit", action="store_true")
+    parser.add_argument("-a", "--arcade", action="store_true")
     parser.add_argument("-f", "--fullscreen", action="store_true")
     args = parser.parse_args()
 
     setup = []
 
-    if args.noquit:
-        setup.append(Setup.NoQuit)
+    if args.arcade:
+            setup.append(Setup.Arcade)
     else:
         setup.append(Setup.Desktop)
 

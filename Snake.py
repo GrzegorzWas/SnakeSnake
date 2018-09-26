@@ -78,6 +78,39 @@ class Snake():
             elif keys_pressed[ self.controls["right"] ]:
                 self.direction.rotate(self.rotation_factor)
 
+    def joy_steer(self, x_axis, y_axis):
+        """
+        change the direction vector according to keys pressed by user
+        """
+        new_direction = copy(self.direction)
+        x_present = True
+        y_present = True
+
+        if self.steering_mode == "absolute":
+            if x_axis < -0.5 or x_axis > 0.5:
+                new_direction.x = x_axis
+            else:
+                x_present = False
+                new_direction.x = 0
+                    
+            if y_axis < -0.5 or y_axis > 0.5:
+                new_direction.y = y_axis
+
+            else:
+                y_present = False
+                new_direction.y = 0
+                
+            if x_present or y_present:
+                if self.direction.angle_to(new_direction) < 180:
+                    self.direction.rotate(self.rotation_factor)
+                elif self.direction.angle_to(new_direction) >= 180:
+                    self.direction.rotate(-self.rotation_factor)
+
+        elif self.steering_mode == "relative":
+            if x_axis < -0.5:
+                self.direction.rotate(-self.rotation_factor)
+            elif x_axis > 0.5:
+                self.direction.rotate(self.rotation_factor)
 
     def move(self):
         """

@@ -193,6 +193,8 @@ class UI:
         self.selected_speed = ""
         self.p1_score = 0
         self.p2_score = 0
+        self.arcade_mode = False
+        self.arcade_select_button = 0
 
         #main menu
         UIPane.Pages[UIPane.MainMenu] = UIPane(
@@ -307,37 +309,74 @@ class UI:
                 self.show_endgame_prompt()
             self.current_page.draw(self.display)
 
+    def arcade_control(self, joystick):
+        if self.arcade_mode:
+            y = controller.get_axis(1)
+            selected = jpystick.get_button(self.arcade_select_button) == pygame.JOYBUTTONDOWN
+
+            if self.current_page == UIPane.Pages[UIPane.PressKeyPrompt]:
+                self.loaded_player_controls[self.currently_changed_control] = key_pressed
+                self.reload_controls()
+                self.current_page = UIPane.Pages[UIPane.KeyBindingsMenu]
+            else:
+                if y == 1:
+                    self.current_page.select_previous_button()
+                elif y == -1:
+                    self.current_page.select_next_button()
+                elif selected:
+                    if self.current_page == UIPane.Pages[UIPane.KeyBindingsMenu]:
+                        if self.current_page.selected_index == 0:
+                            self.currently_changed_control = "up"
+                        elif self.current_page.selected_index == 1:
+                            self.currently_changed_control = "down"
+                        elif self.current_page.selected_index == 2:
+                            self.currently_changed_control = "left"
+                        elif self.current_page.selected_index == 3:
+                            self.currently_changed_control = "right"
+                    self.current_page.choose_option(self.current_page.selected_button)
+                    self.selected_option = str(self.current_page.selected_button)
+                    if self.selected_option == "P1 Key Bindings":
+                        self. currently_changed_player = "p1"
+                    elif self.selected_option == "P2 Key Bindings":
+                        self. currently_changed_player = "p2" 
+                    if self.current_page.selected_button.redirect != None:
+                        
+                        redirect = self.current_page.selected_button.redirect
+                        self.current_page.select_first_button()
+                        self.current_page = UIPane.Pages[redirect]  
+        
     def control(self, key_pressed):
-        if self.current_page == UIPane.Pages[UIPane.PressKeyPrompt]:
-            self.loaded_player_controls[self.currently_changed_control] = key_pressed
-            self.reload_controls()
-            self.current_page = UIPane.Pages[UIPane.KeyBindingsMenu]
-        else:
-            if key_pressed == self.menu_controls["up"]:
-                self.current_page.select_previous_button()
-            elif key_pressed == self.menu_controls["down"]:
-                self.current_page.select_next_button()
-            elif key_pressed == self.menu_controls["select"]:
-                if self.current_page == UIPane.Pages[UIPane.KeyBindingsMenu]:
-                    if self.current_page.selected_index == 0:
-                        self.currently_changed_control = "up"
-                    elif self.current_page.selected_index == 1:
-                        self.currently_changed_control = "down"
-                    elif self.current_page.selected_index == 2:
-                        self.currently_changed_control = "left"
-                    elif self.current_page.selected_index == 3:
-                        self.currently_changed_control = "right"
-                self.current_page.choose_option(self.current_page.selected_button)
-                self.selected_option = str(self.current_page.selected_button)
-                if self.selected_option == "P1 Key Bindings":
-                    self. currently_changed_player = "p1"
-                elif self.selected_option == "P2 Key Bindings":
-                    self. currently_changed_player = "p2" 
-                if self.current_page.selected_button.redirect != None:
-                    
-                    redirect = self.current_page.selected_button.redirect
-                    self.current_page.select_first_button()
-                    self.current_page = UIPane.Pages[redirect]         
+        if not self.arcade_mode:
+            if self.current_page == UIPane.Pages[UIPane.PressKeyPrompt]:
+                self.loaded_player_controls[self.currently_changed_control] = key_pressed
+                self.reload_controls()
+                self.current_page = UIPane.Pages[UIPane.KeyBindingsMenu]
+            else:
+                if key_pressed == self.menu_controls["up"]:
+                    self.current_page.select_previous_button()
+                elif key_pressed == self.menu_controls["down"]:
+                    self.current_page.select_next_button()
+                elif key_pressed == self.menu_controls["select"]:
+                    if self.current_page == UIPane.Pages[UIPane.KeyBindingsMenu]:
+                        if self.current_page.selected_index == 0:
+                            self.currently_changed_control = "up"
+                        elif self.current_page.selected_index == 1:
+                            self.currently_changed_control = "down"
+                        elif self.current_page.selected_index == 2:
+                            self.currently_changed_control = "left"
+                        elif self.current_page.selected_index == 3:
+                            self.currently_changed_control = "right"
+                    self.current_page.choose_option(self.current_page.selected_button)
+                    self.selected_option = str(self.current_page.selected_button)
+                    if self.selected_option == "P1 Key Bindings":
+                        self. currently_changed_player = "p1"
+                    elif self.selected_option == "P2 Key Bindings":
+                        self. currently_changed_player = "p2" 
+                    if self.current_page.selected_button.redirect != None:
+                        
+                        redirect = self.current_page.selected_button.redirect
+                        self.current_page.select_first_button()
+                        self.current_page = UIPane.Pages[redirect]         
 
     def hide(self):
         self.state = UIState.Hidden
@@ -392,6 +431,29 @@ class UI:
 
     def disable_quit_button(self):
         del UIPane.Pages[UIPane.MainMenu].buttons[-1]
+
+    def enable_arcade_mode(self):
+        self.disable_quit_button()
+        #self.arcade_mode = True
+        UIPane.Pages[UIPane.SettingsMenu]= UIPane(
+            buttons = [
+                SettingsOption("Absolute", (None, self.display.height/10 + 160), UIPane.SettingsMenu, "p1"),
+                SettingsOption("Relative", (None, self.display.height/10 + 220), UIPane.SettingsMenu, "p1"),
+                SettingsOption("Absolute", (None, self.display.height/10 + 460), UIPane.SettingsMenu, "p2"),
+                SettingsOption("Relative", (None, self.display.height/10 + 520), UIPane.SettingsMenu, "p2"),
+                MenuOption("Set speed", (None, self.display.height/10 + 700), UIPane.SelectSpeedMenu),
+                MenuOption("Return to menu", (None, self.display.height*9/10), UIPane.MainMenu)
+            ],
+            decorators = [
+                MenuLabel("Controls",       (None, self.display.height/15), 50),
+                #MenuSeparator(              (None, self.display.height/10 + 80), 2, 400),
+                MenuLabel("Blue player",    (None, self.display.height/10 + 100), 30, color=(55, 111, 158), border = (255, 220, 77)),
+                MenuSeparator(              (None, self.display.height/10 + 370), 2, 600),
+                MenuLabel("Yellow player",  (None, self.display.height/10 + 400), 30),
+                MenuSeparator(              (None, self.display.height/10 + 670), 2, 550)
+            ])
+
+
 
     
 
