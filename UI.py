@@ -195,6 +195,11 @@ class UI:
         self.p2_score = 0
         self.arcade_mode = False
         self.arcade_select_button = 0
+        #arcade command last press time
+        self.acc_up = None
+        self.acc_down = None
+        self.acc_select = None
+        self.acc_interval = 1
 
         #main menu
         UIPane.Pages[UIPane.MainMenu] = UIPane(
@@ -319,11 +324,14 @@ class UI:
                 self.reload_controls()
                 self.current_page = UIPane.Pages[UIPane.KeyBindingsMenu]
             else:
-                if y == 1:
+                if y == 1 and time.time() - self.acc_up >= self.acc_interval:
                     self.current_page.select_previous_button()
-                elif y == -1:
+                    self.acc_up = time.time()
+                elif y == -1 and time.time() - self.acc_down >= self.acc_interval:
                     self.current_page.select_next_button()
-                elif selected:
+                    self.acc_down = time.time()
+                elif selected and time.time() - self.acc_select >= self.acc_interval:
+                    self.acc_select = time.time()
                     if self.current_page == UIPane.Pages[UIPane.KeyBindingsMenu]:
                         if self.current_page.selected_index == 0:
                             self.currently_changed_control = "up"
