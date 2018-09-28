@@ -194,12 +194,12 @@ class UI:
         self.p1_score = 0
         self.p2_score = 0
         self.arcade_mode = False
-        self.arcade_select_button = 0
+        self.arcade_select_button = 3
         #arcade command last press time
         self.acc_up = None
         self.acc_down = None
         self.acc_select = None
-        self.acc_interval = 1
+        self.acc_interval = 0.3
 
         #main menu
         UIPane.Pages[UIPane.MainMenu] = UIPane(
@@ -316,18 +316,18 @@ class UI:
 
     def arcade_control(self, joystick):
         if self.arcade_mode:
-            y = controller.get_axis(1)
-            selected = jpystick.get_button(self.arcade_select_button) == pygame.JOYBUTTONDOWN
+            y = joystick.get_axis(1)
+            selected = joystick.get_button(self.arcade_select_button)
 
             if self.current_page == UIPane.Pages[UIPane.PressKeyPrompt]:
                 self.loaded_player_controls[self.currently_changed_control] = key_pressed
                 self.reload_controls()
                 self.current_page = UIPane.Pages[UIPane.KeyBindingsMenu]
             else:
-                if y == 1 and time.time() - self.acc_up >= self.acc_interval:
+                if y < -0.5 and time.time() - self.acc_up >= self.acc_interval:
                     self.current_page.select_previous_button()
                     self.acc_up = time.time()
-                elif y == -1 and time.time() - self.acc_down >= self.acc_interval:
+                elif y > 0.5 and time.time() - self.acc_down >= self.acc_interval:
                     self.current_page.select_next_button()
                     self.acc_down = time.time()
                 elif selected and time.time() - self.acc_select >= self.acc_interval:
@@ -442,7 +442,7 @@ class UI:
 
     def enable_arcade_mode(self):
         self.disable_quit_button()
-        #self.arcade_mode = True
+        self.arcade_mode = True
         UIPane.Pages[UIPane.SettingsMenu]= UIPane(
             buttons = [
                 SettingsOption("Absolute", (None, self.display.height/10 + 160), UIPane.SettingsMenu, "p1"),

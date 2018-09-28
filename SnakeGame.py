@@ -68,10 +68,11 @@ class SnakeGame:
         keys = pygame.key.get_pressed()
         if self.game_manager.game_state == GameState.Running:
             if self.arcade:
-                self.game_manager.control_players_arcade(self.joysticks)
-                self.ui.arcade_control(self.joysticks[1])
+                self.game_manager.control_players_arcade(self.joysticks)            
             else:
                 self.game_manager.control_players(keys)
+        elif self.arcade:
+            self.ui.arcade_control(self.joysticks[1])
         # elif self.game_manager.game_state == GameState.Finished or \
         # self.game_manager.game_state == GameState.Menu:
         #     self.ui.control(keys)
@@ -82,7 +83,7 @@ class SnakeGame:
                     self.game_manager.game_state = GameState.Quit  
                 if self.game_manager.game_state == GameState.Finished or\
                 self.game_manager.game_state == GameState.Menu :
-                    if event.type == pygame.KEYDOWN:
+                    if event.type == pygame.KEYDOWN and not self.arcade:
                         self.ui.control(event.key)
                         #self.start_new_game(GameMode.EatToSurvive)
 
