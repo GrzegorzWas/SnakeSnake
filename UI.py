@@ -302,19 +302,30 @@ class UI:
         
 
     def show_endgame_prompt(self):
+        """
+        I don't even know
+        """
         if self.winner == None:
-            self.display.draw_text("Both players shmuck", 40, (255,255,255), (0,0,0))
+            self.display.draw_text("Nein, wir alle müssen uns weigern, dieser Enttäuschung nachzugeben", 40, (255,255,255), (0,0,0))
         else:
             self.display.draw_text(str(self.winner) + " Won", 40, self.winner.color, bordered=True, border_color = self.loser.color, border_thickness=3)
-            #self.display.draw_text("Apparently " + str(self.loser) + " sucks", 39, self.loser.color, bold=1)
+            #self.display.draw_text("Nein, wir alle müssen uns weigern, dieser Enttäuschung nachzugeben", 39, self.loser.color, bold=1)
 
     def draw(self):
+        """
+        Draw current ui page
+        """
         if self.state == UIState.Visible and self.selected_option != "Quit":  
             if self.current_page == UIPane.Pages[UIPane.EndgameMenu]:   
                 self.show_endgame_prompt()
             self.current_page.draw(self.display)
 
     def arcade_control(self, joystick):
+        """
+        control the interface in arcade mode
+        Args:
+            joystick (pygame.Joystick): joystick used to control the interface
+        """
         if self.arcade_mode:
             y = joystick.get_axis(1)
             selected = joystick.get_button(self.arcade_select_button)
@@ -354,6 +365,11 @@ class UI:
                         self.current_page = UIPane.Pages[redirect]  
         
     def control(self, key_pressed):
+        """
+        control the interface in desktop mode
+        Args:
+            key_pressed (int): theres nothing to explain here
+        """
         if not self.arcade_mode:
             if self.current_page == UIPane.Pages[UIPane.PressKeyPrompt]:
                 self.loaded_player_controls[self.currently_changed_control] = key_pressed
@@ -387,17 +403,29 @@ class UI:
                         self.current_page = UIPane.Pages[redirect]         
 
     def hide(self):
+        """
+        hide the interface
+        """
         self.state = UIState.Hidden
 
     def show_endgame_menu(self):
+        """
+        shows endgame menu with information about the winner and option to reset the game or go back to menu
+        """
         self.current_page = UIPane.Pages[UIPane.EndgameMenu]
 
     def get_selected_option(self):
+        """
+        returns name of the currently selected button 
+        """
         option = self.selected_option
         self.selected_option = None
         return option
 
     def load_controls(self, controls):
+        """
+        Load controls for desired player into the key bindings menu 
+        """
         self.loaded_player_controls = copy(controls)
         u = pygame.key.name(controls["up"])
         d = pygame.key.name(controls["down"])

@@ -17,7 +17,19 @@ class SnakeGame:
     """
     Main game class
     """
-    def __init__(self, s_width, s_height, setup):       
+    def __init__(self, s_width, s_height, setup):
+        """
+        Initialize the game starting in main menu
+        Args:
+            s_width (int): screen_width
+            s_width (int): screen_height
+            setup (Setup[]): list of setup options:
+                Desktop: default option. in this mode everything is controlled by keyboard
+                Arcade: prevents user from quiting the game from ui and changing key bindings
+                        in this mode both the game and ui are controlled by joysticks
+                Windowed: default option. Uses s_width and s_height to determine screen dimensions
+                Fullscreen: ignores s_width and s_height args and enables fullscreen (duh)
+        """
         pygame.init()
         pygame.font.init()
 
@@ -50,6 +62,13 @@ class SnakeGame:
     def start_new_game(self, mode):
         """
         Start a new game
+        Args:
+            Mode (GameMode): selected game mode
+                InfiniteSnake: snakes dont shrink and there are no pickups
+                EatToGrow: snakes shrink to preserve constant length. players
+                            can eat pickups to grow in length and speed up
+                EatToSurvive = snakes shrink and their length decrease in time.
+                            players have to eat pickups to stay alive
         """ 
         self.display.clear()  
         #self.ui.hide()
@@ -73,9 +92,6 @@ class SnakeGame:
                 self.game_manager.control_players(keys)
         elif self.arcade:
             self.ui.arcade_control(self.joysticks[1])
-        # elif self.game_manager.game_state == GameState.Finished or \
-        # self.game_manager.game_state == GameState.Menu:
-        #     self.ui.control(keys)
 
 
         for event in pygame.event.get():
@@ -88,6 +104,9 @@ class SnakeGame:
                         #self.start_new_game(GameMode.EatToSurvive)
 
     def handle_ui_response(self):
+        """
+        Handle user actions performed in the interface
+        """
         option = self.ui.get_selected_option()
         
         #main menu

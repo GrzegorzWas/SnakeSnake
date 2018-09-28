@@ -20,7 +20,9 @@ class GameMode:
     
 
 class GameManager:
-    
+    """
+    Class rsponsible for all the game logic
+    """
     def __init__(self, display, ui, game_mode, game_state=GameState.Menu, p1=None, p2=None):
         self.display = display
         self.player1 = Player1(self.display)
@@ -126,6 +128,9 @@ class GameManager:
         #     self.game_state = GameState.Quit
           
     def find_pickup(self, collision_position):
+        """
+        Look through the list of pickups to fint the one player collided with 
+        """
         closest_pickup = self.pickups[0]
         current_dist = closest_pickup.distance_to(collision_position)
         for p in self.pickups:
@@ -135,6 +140,9 @@ class GameManager:
         return closest_pickup
 
     def handle_pickup_collision(self, player):
+        """
+        find collided pickup and increase player's score
+        """
         p = self.find_pickup(player.collision_position)
         self.display.erase_enqueue(p, self.pickup_radius)
         self.pickups.remove(p)
@@ -152,6 +160,9 @@ class GameManager:
         self.spawn_pickup()
 
     def spawn_pickup(self):
+        """
+        Spawn picku on random location
+        """
         x = random.randrange(self.pickup_radius , self.display.play_area_width - self.pickup_radius)
         y = random.randrange(self.pickup_radius, self.display.play_area_height - self.pickup_radius)
 
@@ -179,6 +190,9 @@ class GameManager:
         self.player2.move()
 
     def finish_game(self, winner = None, loser = None):
+        """
+        display endgame screen and show who won
+        """
         self.winner = winner
         self.ui.winner = winner
         self.loser = loser
